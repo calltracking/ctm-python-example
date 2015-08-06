@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Add a New Account</h1>
+  <form method="POST" action="/accounts/create">
+    <label>Account Name</label>
+    <input type="text" name="name"/>
+
+    <label>Timezone</label>
+    <select name="timezone">
+      <option>America/New_York</option>
+      <option>America/Los_Angeles</option>
+      <option>Europe/London</option>
+    </select>
+
+    <input type="submit" value="Create Account"/>
+  </form>
+{% endblock %}

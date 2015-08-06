@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Logs <small>{{pager.total_entries}} calls</small></h1>
+  <table class="entries">
+    <thead>
+      <tr>
+        <th>Caller Name</th>
+        <th>Caller Number</th>
+        <th>Source</th>
+        <th>Recording</th>
+        <th>Call Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for call in pager.calls %}
+        <tr>
+          <td>{{call.name}}</td>
+          <td>{{call.caller_number}}</td>
+          <td>{{call.source}}</td>
+          <td>
+            {% if call.audio %}
+              <div><a href="{{call.audio}}" class="recording"><img src="/static/audio.jpg"/></a></div>
+            {% else %}
+              <cite>no audio</cite>
+            {% endif %}
+            <div>{{call.duration}} seconds</div>
+          </td>
+          <td>{{call.called_at}}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="10"><em>No logs to show</em></td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+    </tfoot>
+  </table>
+  {% if pager.previous_page %}
+    <a href="?page={{pager.page-1}}">Prevous page</a>
+  {% endif %}
+  {% if pager.next_page %}
+  <a href="?page={{pager.page+1}}">Next page</a>
+  {% endif %}
+  <script>
+    var recs = document.querySelectorAll("a.recording");
+    for (var i = 0, len = recs.length; i < len; ++i) {
+      recs[i].addEventListener("click", function(event) {
+        event.preventDefault();
+        var audio = this.getAttribute("href");
+        this.parentNode.innerHTML = '<audio controls autoplay>' + 
+           '<source src="' + audio + '" type="audio/wav"/>' + 
+           '<source src="' + audio + '.mp3" type="audio/mp3"/>' + 
+        '</audio>';
+      }, false);
+    }
+  </script>
+{% endblock %}

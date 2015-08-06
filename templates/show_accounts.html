@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Accounts</h1>
+  <ul class="entries">
+  {% for account in accounts %}
+    <li><h2><a href="/accounts/{{account.id}}">{{ account.name }}</a></h2></li>
+  {% else %}
+    <li><em>No accounts to show</em></li>
+  {% endfor %}
+  </ul>
+{% endblock %}
