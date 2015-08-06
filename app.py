@@ -87,19 +87,12 @@ def show_numbers():
   page = request.args.get('page')
 
   pager = ctm_get('/accounts/%d/numbers' % g.account_id, {'page': page}) 
-  print json.dumps(pager)
 
   return render_template('show_numbers.html', pager=pager)
 
 @app.route('/numbers/<number_id>/edit')
 def edit_number(number_id):
-
   number = ctm_get('/accounts/%d/numbers/%s' % (g.account_id, number_id)) 
-
-  if number['route_to'] == 'menu':
-    print "menu"
-  elif number['route_to'] == 'geo':
-    print "geo"
 
   return render_template('edit_number.html', number=number)
 
@@ -107,8 +100,6 @@ def edit_number(number_id):
 def update_number(number_id):
   data = dict({'name': request.form['name']})
   dial_route = request.form['route_to']
-
-  print request.form
 
   if   dial_route == 'voice_menu':
     data['voice_menu_id'] = request.form['route_object']
