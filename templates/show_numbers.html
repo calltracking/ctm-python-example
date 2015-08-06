@@ -21,13 +21,16 @@
           <td>
             {% if number.route_to %}
               {% if number.route_to.type == 'voice_menu' %}
+                menu: {{number.route_to.dial.name}}
               {% endif %}
               {% if number.route_to.type == 'geo_config' %}
+                geo: {{number.route_to.dial.name}}
               {% endif %}
               {% if number.route_to.type == 'call_queue' %}
                 queue: {{number.route_to.dial.name}}
               {% endif %}
               {% if number.route_to.type == 'user' %}
+                agent: {{number.route_to.dial.name}}
               {% endif %}
               {% if number.route_to.type == 'receiving_number' %}
                 <ul>

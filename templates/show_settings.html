@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Settings <small>{{pager.total_entries}} settings</small></h1>
+  <table class="entries">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Greeting</th>
+        <th>Agent Whisper</th>
+        <th>Inbound Recording</th>
+        <th>Outbound Recording</th>
+        <th>Transcriptions</th>
+        <th>Caller Lookup</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for config in pager.configs %}
+        <tr>
+          <td><a href="/settings/{{config.id}}/edit">{{config.name}}</a></td>
+          <td>{{config.play_message}}</td>
+          <td>{% if config.whisper_on %}yes{% endif %}</td>
+          <td>{{config.inbound_recordings_on}}</td>
+          <td>{{config.outbound_recording_on}}</td>
+          <td>{{config.transcription}}</td>
+          <td>{{config.premium_callerid_enabled}}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="10"><em>No settings to show</em></td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+    </tfoot>
+  </table>
+  {% if pager.previous_page %}
+    <a href="?page={{pager.page-1}}">Previous page</a>
+  {% endif %}
+  {% if pager.next_page %}
+    <a href="?page={{pager.page+1}}">Next page</a>
+  {% endif %}
+{% endblock %}

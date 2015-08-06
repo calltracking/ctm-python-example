@@ -115,15 +115,57 @@ def update_number(number_id):
     data['number_ids'] = request.form['route_object']
 
   data['tracking_source_id'] = request.form['source']
+  data['number_config_id'] = request.form['number_config_id']
   data['dial_route'] = dial_route
 
   number = ctm_post('accounts/%d/numbers/%s/update_number' % (g.account_id, number_id), data)
   flash('Updated Phone Number Routing')
   return redirect(url_for('edit_number', number_id=number_id))
 
+@app.route('/settings')
+def show_settings():
+  page = request.args.get('page')
+
+  pager = ctm_get('/accounts/%d/call_settings' % g.account_id, {'page': page}) 
+
+  return render_template('show_settings.html', pager=pager)
+
+@app.route('/settings/<id>/edit')
+def edit_settings(id):
+  config = ctm_get('/accounts/%d/call_settings/%s' % (g.account_id, id))
+
+  return render_template('edit_setting.html', config=config)
+
+@app.route('/settings/<id>', methods=['POST'])
+def update_setting(id):
+
+  data = dict({'name': request.form['name'], 'play_message': request.form['play_message'], '_method': 'put'})
+
+  if request.form['inbound_recordings_on']:
+    data['inbound_recordings_on'] = 1
+
+  if request.form['outbound_recording_on']:
+    data['outbound_recording_on'] = 1
+
+  if request.form['transcription']:
+    data['transcription'] = 1
+
+  if request.form['premium_callerid_enabled']:
+    data['premium_callerid_enabled'] = 1
+
+  setting = ctm_post('accounts/%d/call_settings/%s' % (g.account_id, id), data)
+
+  flash('Updated Call Settings')
+
+  return redirect(url_for('edit_settings', id=id))
+
+# lookup a specific object e.g. voice menu, call queue, receiving number, etc...
 @app.route('/lookup/<object_type>')
 def lookup_object(object_type):
   search = request.args.get('q')
+  if not search:
+    search = ''
+
   objects = ctm_get('/accounts/%d/lookup' % g.account_id, {'object_type': object_type, 'search': search})
   return json.dumps(objects)
 

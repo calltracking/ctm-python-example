@@ -41,6 +41,17 @@
       </select>
     </section>
 
+    <section id="call_setting">
+      <label>Call Setting</label>
+      <select name="number_config_id">
+        {% if number.call_setting %}
+        <option value="{{number.call_setting.id}}">{{number.call_setting.name}}</option>
+        {% else %}
+        <option value=''>set call setting</option>
+        {% endif %}
+      </select>
+    </section>
+
     <section>
       <input type="submit" value="Update Number"/>
     </section>

@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>{{config.name}} <small>settings</small></h1>
+  <form method="POST" action="/settings/{{config.id}}">
+    <section>
+      <label>Name</label>
+      <input type="text" name="name" value="{{config.name}}"/>
+    </section>
+    <section>
+      <label>Greeting</label>
+      <input type="text" name="play_message" value="{{config.play_message}}"/>
+      <cite>message format has a URL like syntax.</cite>
+      <ul>
+        <li><strong>say:</strong> takes two additional arguments, alice:en-GB or alice:en-US to indicate the language option.</li>
+        <li><strong>play:</strong> is followed by a URL that points to a wave or mp3 file.  It is important that the file format is wave or mp3 any other format and calls will drop.</li>
+      </ul>
+      <p>example:</p>
+      <pre>say:alice:en-GB:thank you for calling this call will be recorded.</pre>
+    </section>
+    <section>
+      <label>Record inbound calls <input type="checkbox" name="inbound_recordings_on" {% if config.inbound_recordings_on %}checked{% endif %} value="on"/> </label>
+    </section>
+      
+    <section>
+      <label>Record outbound calls <input type="checkbox" name="outbound_recording_on" {% if config.outbound_recording_on %}checked{% endif %} value="on"/> </label>
+    </section>
+
+    <section>
+      <label>Transcription <input type="checkbox" name="transcription" {% if config.transcription %}checked{% endif %} value="on" /> </label>
+    </section>
+
+    <section>
+      <label>Caller Lookup <input type="checkbox" name="premium_callerid_enabled" {% if config.premium_callerid_enabled %}checked{% endif %} value="on" /> </label>
+    </section>
+
+    <section>
+      <input type="submit" value="Save Settings"/>
+    </section>
+  </form>
+{% endblock %}

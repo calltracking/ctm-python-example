@@ -23,7 +23,7 @@ function setupPicker(defaultOptions) {
       },
       cache: true
     },
-    minimumInputLength: 1
+    minimumInputLength: 0
   });
 }
 $(function() {
@@ -44,7 +44,25 @@ $(function() {
       },
       cache: true
     },
-    minimumInputLength: 1
+    minimumInputLength: 0
+  });
+  $("#call_setting select").select2({
+    ajax: {
+      url: "/lookup/call_setting",
+      dataType: 'json',
+      delay: 250,
+      data: function(params) {
+        return {
+          q: params.term,
+          page: params.page
+        }
+      },
+      processResults: function(data, page) {
+        return data;
+      },
+      cache: true
+    },
+    minimumInputLength: 0
   });
 
   $("#route_to select").select2().on("change", function() {
