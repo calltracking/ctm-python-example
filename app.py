@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.config.update(dict(
   DEBUG=True,
   SECRET_KEY='Update to something secure',
-  CTM_AUTH=base64.standard_b64encode('%s:%s' % (os.environ['CTM_TOKEN'], os.environ['CTM_TOKEN'])), # get these from your CTM agency settings page
+  CTM_AUTH=base64.standard_b64encode('%s:%s' % (os.environ['CTM_TOKEN'], os.environ['CTM_SECRET'])), # get these from your CTM agency settings page
   CTM_HOST=os.environ['CTM_HOST'] # api.calltrackingmetrics.com
 ))
 
