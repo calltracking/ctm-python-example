@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Numbers <small>{{pager.total_entries}} numbers</small></h1>
+  <table class="entries">
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Dial Route</th>
+        <th>Source</th>
+        <th>Call Setting</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for number in pager.numbers %}
+        <tr>
+          <td>
+            <a href="/numbers/{{number.id}}/edit"><label>{% if number.name %} {{number.name}} {% endif %}</label><br/>
+            <strong>{{number.formatted}}</strong><br/>
+            <cite>{{number.number}}</cite></a>
+          </td>
+          <td>
+            {% if number.route_to %}
+              {% if number.route_to.type == 'voice_menu' %}
+              {% endif %}
+              {% if number.route_to.type == 'geo_config' %}
+              {% endif %}
+              {% if number.route_to.type == 'call_queue' %}
+                queue: {{number.route_to.dial.name}}
+              {% endif %}
+              {% if number.route_to.type == 'user' %}
+              {% endif %}
+              {% if number.route_to.type == 'receiving_number' %}
+                <ul>
+                  {% for ring in number.route_to.dial %}
+                    <li><cite>{{ring.name}}</cite> {{ring.number}}</li>
+                  {% else %}
+                    <li>no numbers</li>
+                  {% endfor %}
+                </ul>
+                ring: {{number.route_to.mode}}
+              {% endif %}
+            {% else %}
+              <em>no route set</em>
+            {% endif %}
+          </td>
+          <td>
+            {% if number.source %}
+              {{number.source.name}}
+            {% else %}
+              <em>no source</em>
+            {% endif %}
+          </td>
+          <td>
+            {% if number.call_setting %}
+              {{number.call_setting.name}}
+            {% else %}
+              <em>no setting</em>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="10"><em>No numbers to show</em></td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+    </tfoot>
+  </table>
+  {% if pager.previous_page %}
+    <a href="?page={{pager.page-1}}">Prevous page</a>
+  {% endif %}
+  {% if pager.next_page %}
+  <a href="?page={{pager.page+1}}">Next page</a>
+  {% endif %}
+{% endblock %}

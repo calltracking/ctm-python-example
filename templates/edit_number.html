@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>{{number.formatted}} <small>{{number.number}}</small></h1>
+  <form method="POST" action="/numbers/{{number.id}}">
+    <section id="name">
+      <label>Name</label>
+      <input type="text" name="name" value="{{number.name}}"/>
+    </section>
+
+    <section id="route_to">
+      <label>Route calls to</label>
+      <select name="route_to">
+        <option value="voice_menu" {% if number.route_to.type == 'voice_menu' %}selected{% endif %}>Voice Menu</option>
+        <option value="geo_config" {% if number.route_to.type == 'geo_config' %}selected{% endif %}>Geo Router</option>
+        <option value="call_queue" {% if number.route_to.type == 'call_queue' %}selected{% endif %}>Call Queue</option>
+        <option value="user" {% if number.route_to.type == 'user' %}selected{% endif %}>Call User/Agent</option>
+        <option value="receiving_number" {% if number.route_to.type == 'receiving_number' %}selected{% endif %}>Dial Numbers</option>
+      </select>
+    </section>
+
+    <section id="route_selection" data-type="{{number.route_to.type}}">
+      {% if number.route_to.type == 'receiving_number' %}
+        {% for dial in number.route_to.dial %}
+          <details name="{{dial.name}} {{dial.number}}" id="{{dial.id}}"></details>
+        {% else %}
+        {% endfor %}
+      {% else %}
+        <details name="{{number.route_to.dial.name}}" id="{{number.route_to.dial.id}}"></details>
+      {% endif %}
+      <details></details>
+    </section>
+    
+    <section id="tracking_source">
+      <label>Tracking Source</label>
+      <select name="source">
+        {% if number.source %}
+        <option value="{{number.source.id}}">{{number.source.name}}</option>
+        {% else %}
+        <option value=''>set source</option>
+        {% endif %}
+      </select>
+    </section>
+
+    <section>
+      <input type="submit" value="Update Number"/>
+    </section>
+  </form>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/2.1.3/mustache.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+  <script src="/static/templates.js"></script>
+  <script src="/static/number.js"></script>
+{% endblock %}
