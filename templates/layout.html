@@ -18,7 +18,8 @@
       <a href="/">Calls</a>
       <a href="/settings">Settings</a>
       {% if g.account_id %}
-        <small>{{g.account_name}} {{g.account_id}}</small>
+        
+        <small><a href="/numbers/new">Buy Numbers</a> in {{g.account_name}} {{g.account_id}}</small>
       {% endif %}
     </nav>
   </header>

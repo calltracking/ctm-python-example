@@ -1,34 +1,42 @@
 # -*- coding: utf-8 -*-
+# when testing if you want to point to a separate ctm domain
+import ssl
+import socket
 import os
 import httplib
 import base64
 import json
 import urllib
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
-
-# when testing if you want to point to a separate ctm domain
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+import uuid
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
+from flask.ext.socketio import SocketIO, emit, disconnect
 
 app = Flask(__name__)
 app.config.update(dict(
-  DEBUG=True,
+  DEBUG=(os.environ['CTM_ENV'] == 'development'),
   SECRET_KEY='Update to something secure',
   CTM_AUTH=base64.standard_b64encode('%s:%s' % (os.environ['CTM_TOKEN'], os.environ['CTM_SECRET'])), # get these from your CTM agency settings page
   CTM_HOST=os.environ['CTM_HOST'] # api.calltrackingmetrics.com
 ))
+socketio = SocketIO(app)
+
+def get_http_conn():
+  if app.config['DEBUG']:
+    return httplib.HTTPSConnection(app.config['CTM_HOST'], 443, None, None, None, socket._GLOBAL_DEFAULT_TIMEOUT, None, ssl._create_unverified_context())
+  return httplib.HTTPSConnection(app.config['CTM_HOST'])
 
 def ctm_get(endpoint, query=dict()):
-  conn = httplib.HTTPSConnection(app.config['CTM_HOST'])
+  conn = get_http_conn()
   headers = { 'Authorization' : 'Basic %s' %  app.config['CTM_AUTH'] }
   conn.request("GET","/api/v1/" + endpoint + ".json?" + urllib.urlencode(query,True), headers=headers)
   res = conn.getresponse()
   print res.status, res.reason
   if res.status == 200:
     return json.load(res)
+  print res.read()
 
 def ctm_post(endpoint, post_body=dict()):
-  conn = httplib.HTTPSConnection(app.config['CTM_HOST'])
+  conn = get_http_conn()
   headers = { 'Authorization' : 'Basic %s' %  app.config['CTM_AUTH'] }
   conn.request("POST","/api/v1/" + endpoint + ".json", body=urllib.urlencode(post_body,True), headers=headers)
   res = conn.getresponse()
@@ -41,15 +49,19 @@ def ctm_post(endpoint, post_body=dict()):
 def verify_session():
   g.account_id   = session.get('account_id')
   g.account_name = session.get('account_name')
-  if not g.account_id and request.endpoint != 'show_accounts' and request.endpoint != 'change_accounts':
+
+  if not g.account_id and request.endpoint != 'show_accounts' and request.endpoint != 'change_accounts' and request.endpoint != 'purchase_notify_event':
     flash('Choose an account to get started')
     return redirect(url_for('show_accounts'))
 
 @app.route('/accounts')
 def show_accounts():
-  pager = ctm_get('accounts', {'limit_fields[]': ['name', 'id']})
-  accounts = pager['accounts']
-  return render_template('show_accounts.html', accounts=accounts)
+  page = request.args.get('page')
+  if not page:
+    page = 1
+
+  pager = ctm_get('accounts', {'limit_fields[]': ['name', 'id'], 'page': page})
+  return render_template('show_accounts.html', pager=pager)
 
 @app.route('/accounts/new')
 def new_account():
@@ -74,9 +86,34 @@ def change_accounts(account_id):
   session['account_name'] = account['name']
   return redirect(url_for('show_calls'))
 
+@app.route('/google/links')
+def get_google_links():
+  data = ctm_get('ga/links')
+  return jsonify(data)
+
+@app.route('/google/<int:account_id>/properties')
+def get_google_property(account_id):
+  data = ctm_get('accounts/%d/ga/link' % account_id)
+  return jsonify(data)
+
+@app.route('/google/setup')
+def setup_google():
+  return render_template('setup_google.html')
+
+@app.route('/google/link', methods=['POST'])
+def link_google():
+  uacode = request.form['uacode']
+  link_id = request.form['link_id']
+  data = dict({'link_id': request.form['link_id'], 'default': uacode})
+  ctm_post('accounts/%d/ga/link' % g.account_id, data)
+  flash('Google Web Property now assigned to your account.')
+  return redirect('/google/setup')
+
 @app.route('/')
 def show_calls():
   page = request.args.get('page')
+  if not page:
+    page = 1
 
   pager = ctm_get('/accounts/%d/calls' % g.account_id, {'page': page}) 
 
@@ -85,6 +122,8 @@ def show_calls():
 @app.route('/numbers')
 def show_numbers():
   page = request.args.get('page')
+  if not page:
+    page = 1
 
   pager = ctm_get('/accounts/%d/numbers' % g.account_id, {'page': page}) 
 
@@ -112,7 +151,7 @@ def update_number(number_id):
     data['user_id'] = request.form['route_object']
   elif dial_route == 'receiving_number':
     dial_route = 'number'
-    data['number_ids'] = request.form['route_object']
+    data['numbers_id[]'] = request.form.getlist('route_object[]')
 
   data['tracking_source_id'] = request.form['source']
   data['number_config_id'] = request.form['number_config_id']
@@ -122,11 +161,61 @@ def update_number(number_id):
   flash('Updated Phone Number Routing')
   return redirect(url_for('edit_number', number_id=number_id))
 
+@app.route('/numbers/new')
+def new_number():
+  return render_template('new_number.html') 
+
+@app.route('/numbers/buy', methods=['POST'])
+def buy_numbers():
+  uid  = str(uuid.uuid1())
+  data = dict({'status_url': request.url_root + 'numbers/purchase/' + uid,
+               'number[]': request.form.getlist('numbers[]')})
+
+  res  = ctm_post('accounts/%d/numbers/purchase' % g.account_id, data)
+
+  return jsonify(data)
+
+@app.route('/numbers/check/<id>')
+def check_purchase():
+  return jsonify({"status": "pending"})
+
+# a status_url included when purchasing numbers that CTM will
+# send allowing the server to notify the client about the order status
+@app.route('/numbers/purchase/<id>', methods=['POST'])
+def purchase_notify_event(id):
+  print "socketio.emit#purchase"
+  purchase = request.get_json(force=True)
+  print purchase
+  socketio.emit("purchase", purchase, namespace='/ctm')
+  return jsonify({"status": "ack"})
+
+@socketio.on('connect', namespace='/ctm')
+def ctm_connect():
+  emit('linked', {'data': 'Connected'})
+
+@app.route('/numbers/search/<country>/<searchby>')
+def search_numbers(country, searchby):
+  # example query
+  # https://api.calltrackingmetrics.com/api/v1/accounts/18614/numbers/search.json?country=DE&searchby=area&areacode=&pattern= 
+  areacode = request.args.get('areacode')
+
+  if not searchby or searchby == 'local':
+    searchby = 'area'
+
+  if not areacode:
+    areacode = ''
+
+  numbers = ctm_get('accounts/%d/numbers/search' % g.account_id, {'searchby': searchby, 'country': country, 'areacode': areacode})
+
+  return jsonify(numbers)
+
 @app.route('/settings')
 def show_settings():
   page = request.args.get('page')
+  if not page:
+    page = 1
 
-  pager = ctm_get('/accounts/%d/call_settings' % g.account_id, {'page': page}) 
+  pager = ctm_get('accounts/%d/call_settings' % g.account_id, {'page': page}) 
 
   return render_template('show_settings.html', pager=pager)
 
@@ -159,6 +248,7 @@ def update_setting(id):
 
   return redirect(url_for('edit_settings', id=id))
 
+
 # lookup a specific object e.g. voice menu, call queue, receiving number, etc...
 @app.route('/lookup/<object_type>')
 def lookup_object(object_type):
@@ -166,8 +256,8 @@ def lookup_object(object_type):
   if not search:
     search = ''
 
-  objects = ctm_get('/accounts/%d/lookup' % g.account_id, {'object_type': object_type, 'search': search})
+  objects = ctm_get('/accounts/%d/lookup' % g.account_id, {'object_type': object_type, 'search': search, 'idstr': '1'})
   return json.dumps(objects)
 
-if __name__ == "__main__":
-  app.run()
+if __name__ == '__main__':
+  socketio.run(app)

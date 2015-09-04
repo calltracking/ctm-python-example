@@ -1,11 +1,17 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h1>Accounts</h1>
+  <h1>Accounts <small><a href="/accounts/new">Add Account</a> | {{pager.total_entries}} accounts</small></h1>
   <ul class="entries">
-  {% for account in accounts %}
+  {% for account in pager.accounts %}
     <li><h2><a href="/accounts/{{account.id}}">{{ account.name }}</a></h2></li>
   {% else %}
     <li><em>No accounts to show</em></li>
   {% endfor %}
   </ul>
+  {% if pager.previous_page %}
+    <a href="?page={{pager.page-1}}">Previous page</a>
+  {% endif %}
+  {% if pager.next_page %}
+    <a href="?page={{pager.page+1}}">Next page</a>
+  {% endif %}
 {% endblock %}

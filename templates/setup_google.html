@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Setup Account Google Integration</h1>
+  <form method="POST" action="/google/link">
+    <label>Use Existing Link</label>
+    <select id="links" name="link_id">
+    </select>
+
+    <label>Choose the Web Property</label>
+    <select id="uacode" name="uacode">
+    </select>
+
+    <input type="submit" value="Link To Site" disabled id="submit"/>
+  </form>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script>
+  $(function() {
+    $.get("/google/links", function(res) {
+      var opts = "<option></option>" + res.sites.map(function(link) {
+        return "<option aid='" + link.account_id + "' value='"+link.id+"'>Account #" + link.account_id + " for Google Account: " + (link.email ? link.email : ' no email provided') + "</option>";
+      }).join("");
+      $("#links").html(opts);
+      $("#links").change(function() {
+        var siteId = $(this).val();
+        var accountId = $(this).find("option:selected").attr("aid");
+        if (!siteId) { $("#uacode").html(''); $("#submit").prop("disabled", true); return; }
+        $.get("/google/" + accountId + "/properties", function(detail) {
+          var opts = detail.uacodes.map(function(code) {
+            return "<option value='" + code.webproperty + "'>" + code.account + " " + code.webproperty + "</option>";
+          }).join("");
+          $("#uacode").html(opts)
+          $("#submit").prop("disabled", false);
+        },'json');
+      });
+    },'json');
+  });
+  </script>
+{% endblock %}

@@ -25,9 +25,11 @@ var Templates = {
     '</select>',
   route_to_receiving_number: '<label>Dial Multiple Numbers</label>' +
     '<select name="ringtype"><option>simultaneous</option><option>round robin</option></select>' + 
-    '<select class="picker" name="route_object" multiple data-type="receiving_number">' +
+    '<select class="picker" name="route_object[]" multiple data-type="receiving_number">' +
     '  {{#dial}} ' +
     '    <option selected value="{{id}}">{{name}}</option> ' +
     '  {{/dial}} ' +
     '</select>',
+  search_numbers: '{{#numbers}}<li>{{phone_number}} <a class="buy-number" href="#add" data-number={{phone_number}}>add</a></li>{{/numbers}}',
+  cart: '<h3>Order Numbers <a id="checkout" href="#checkout">Buy Numbers</a></h3><ul>{{#numbers}}<li data-number="{{.}}">{{.}}</li>{{/numbers}}</ul>',
 }

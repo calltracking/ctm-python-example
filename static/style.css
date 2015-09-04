@@ -24,6 +24,7 @@ table th                     { text-align: left }
 table td                     { border-bottom:1px solid #ccc; padding-bottom: 10px; }
 h1 small,                    
 nav small                    { text-align:right; float:right; }
+h1 small                     { font-size: 18px; }                   
 
 form label                   { display:block; }
 form select,
@@ -42,4 +43,10 @@ form input[type=text]         { margin:10px; padding: 10px; border: solid 1px #d
 form input[type=text]:hover   { border: solid 1px #28aadc; -webkit-box-shadow: 0 0 5px 1px #28aadc; -moz-box-shadow: 0 0 5px 1px #28aadc;
                                 box-shadow: 0 0 5px 1px #28aadc; }
 
-form section    { margin-bottom:20px; border:1px solid #eee; padding:20px; }
+form section                  { margin-bottom:20px; border:1px solid #eee; padding:20px; }
+
+form.buy-numbers select,
+form.buy-numbers input        { width:auto; display:inline-block }
+#search-results               { float:left; }
+#cart                         { float:right; }
+.clear                        { clear:both }

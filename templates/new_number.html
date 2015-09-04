@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Buy Tracking Number</h1>
+  <form class="buy-numbers" action="/numbers/new">
+    <section class="search">
+      <select class="country" name="country">
+        <option value="US">United States</option>
+        <option value="AU">Australia</option>
+        <option value="AT">Austria</option>
+        <option value="BE">Belgium</option>
+        <option value="BR">Brazil</option>
+        <option value="CA">Canada</option>
+        <option value="CY">Cyprus</option>
+        <option value="CZ">Czech Republic</option>
+        <option value="DK">Denmark</option>
+        <option value="DO">Dominican Republic</option>
+        <option value="SV">El Salvador</option>
+        <option value="EE">Estonia</option>
+        <option value="FI">Finland</option>
+        <option value="FR">France</option>
+        <option value="DE">Germany</option>
+        <option value="GR">Greece</option>
+        <option value="HK">Hong Kong</option>
+        <option value="IE">Ireland</option>
+        <option value="IL">Israel</option>
+        <option value="IT">Italy</option>
+        <option value="JP">Japan</option>
+        <option value="LV">Latvia</option>
+        <option value="LT">Lithuania</option>
+        <option value="LU">Luxembourg</option>
+        <option value="MX">Mexico</option>
+        <option value="NL">Netherlands</option>
+        <option value="NZ">New Zealand</option>
+        <option value="PE">Peru</option>
+        <option value="PL">Poland</option>
+        <option value="PT">Portugal</option>
+        <option value="PR">Puerto Rico</option>
+        <option value="RO">Romania</option>
+        <option value="SK">Slovakia</option>
+        <option value="ZA">South Africa</option>
+        <option value="ES">Spain</option>
+        <option value="SE">Sweden</option>
+        <option value="CH">Switzerland</option>
+        <option value="GB">United Kingdom</option>
+      </select>
+      <select class="searchby" name="searchby">
+        <option value="area">Local</option>
+        <option value="tollfree">Toll Free</option>
+      </select>
+      <input class="areacode" placeholder="area code" type="text" name="areacode" value=""/>
+      <input type="submit" value="Search"/>
+    </section>
+  </form>
+  <div id="progress-status"></div>
+  <ul id="search-results">
+  </ul>
+  <div id="cart">
+  </div>
+  <div class="clear"></div>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/2.1.3/mustache.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.17/socket.io.min.js"></script>
+  <script src="/static/templates.js"></script>
+  <script src="/static/buy.js"></script>
+{% endblock %}
