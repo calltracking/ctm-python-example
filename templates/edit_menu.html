@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>{{menu.name}}</h1>
+  <form method="POST" action="/menus/{{menu.id}}">
+    <section id="name">
+      <label>Name</label>
+      <input type="text" name="name" value="{{menu.name}}"/>
+    </section>
+
+    <section id="prompt">
+      <label>Voice prompt</label>
+      <input type="text" name="play_message" value="{{menu.play_message}}"/>
+    </section>
+
+    <section id="prompt_logic">
+      <label>Prompt Retries</label>
+      <input type="text" name="prompt_retries" value="{{menu.prompt_retries}}"/>
+
+      <label>Max KeyPress</label>
+      <input type="text" name="input_maxkeys" value="{{menu.input_maxkeys}}"/>
+
+      <label>Input Timeout</label>
+      <input type="text" name="input_timeout" value="{{menu.input_timeout}}"/>
+    </section>
+
+    <section id="schedule">
+      <label>Routing Schedule <small>adjust the call routing by time of day. e.g. skip this menu if the time of day does not fall within your schedule.</small></label>
+      <select type="text" name="schedule" class="picker">
+        <option value="{{menu.schedule_id}}"></option>
+      </select>
+      <p></p>
+      <div id="schedule_routing">
+        <label>Route calls to</label>
+        <select name="route_to" class="route_select">
+          <option value="voice_menu" {% if menu.after_hours_action_label == 'voice_menu' %}selected{% endif %}>Voice Menu</option>
+          <option value="geo_config" {% if menu.after_hours_action_label == 'geo_config' %}selected{% endif %}>Geo Router</option>
+          <option value="call_queue" {% if menu.after_hours_action_label == 'call_queue' %}selected{% endif %}>Call Queue</option>
+          <option value="user" {% if menu.after_hours_action_label == 'user' %}selected{% endif %}>Call User/Agent</option>
+          <option value="receiving_number" {% if menu.after_hours_action_label == 'receiving_number' %}selected{% endif %}>Dial Numbers</option>
+        </select>
+      </div>
+      <p></p>
+      <div id="schedule_route_to"></div>
+    </section>
+
+    <section>
+      <input type="submit" value="Save Menu"/>
+    </section>
+  </form>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/2.1.3/mustache.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+  <script src="/static/templates.js"></script>
+  <script src="/static/menu.js"></script>
+{% endblock %}

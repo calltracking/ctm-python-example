@@ -15,10 +15,10 @@
     <nav>
       <a href="/accounts">Accounts</a>
       <a href="/numbers">Numbers</a>
+      <a href="/menus">Menus</a>
       <a href="/">Calls</a>
       <a href="/settings">Settings</a>
       {% if g.account_id %}
-        
         <small><a href="/numbers/new">Buy Numbers</a> in {{g.account_name}} {{g.account_id}}</small>
       {% endif %}
     </nav>

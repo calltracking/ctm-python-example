@@ -1,9 +1,7 @@
 function setupPicker(defaultOptions) {
   if (!defaultOptions) { defaultOptions = {}; }
   var objectType = $("#route_to select").select2('val');
-  console.log(defaultOptions);
-  var template   = Mustache.to_html(Templates['route_to_' + objectType],defaultOptions);
-  console.log(template);
+  var template  = Mustache.to_html(Templates['route_to_' + objectType],defaultOptions);
 
   $("#route_selection").html(template);
 

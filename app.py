@@ -77,7 +77,7 @@ def create_account():
     return render_template('new_account.html')
 
   session['account_id'] = res['id']
-  return redirect(url_for('show_calls'))
+  return redirect(url_for('setup_google'))
 
 @app.route('/accounts/<int:account_id>')
 def change_accounts(account_id):
@@ -247,6 +247,40 @@ def update_setting(id):
   flash('Updated Call Settings')
 
   return redirect(url_for('edit_settings', id=id))
+
+@app.route('/menus', methods=['GET'])
+def get_menus():
+  page = request.args.get('page')
+  if not page:
+    page = 1
+  pager = ctm_get('/accounts/%d/voice_menus' % g.account_id, {'page': page}) 
+  return render_template('show_menus.html', pager=pager)
+
+@app.route('/menus/<menu_id>/edit', methods=['GET'])
+def edit_menu(menu_id):
+  menu = ctm_get('/accounts/%d/voice_menus/%s' % (g.account_id, menu_id)) 
+  return render_template('edit_menu.html', menu=menu)
+
+@app.route('/menus/<menu_id>/items/<item_id>', methods=['GET'])
+def show_menu_item(menu_id, item_id):
+  menu = ctm_get('/accounts/%d/voice_menus/%s' % (g.account_id, menu_id)) 
+  return render_template('edit_menu.html', menu=menu)
+
+@app.route('/menus/<menu_id>', methods=['POST'])
+def update_menu(menu_id):
+  res = ctm_post("accounts/%d/voice_menus/%s" % (g.account_id, menu_id),
+        {'voice_menu[name]':           request.form['name'],
+         'voice_menu[timezone]':       request.form['play_message'],
+         'voice_menu[prompt_retries]': request.form['prompt_retries'],
+         'voice_menu[input_maxkeys]':  request.form['input_maxkeys'],
+         'voice_menu[input_timeout]':  request.form['input_timeout']
+        })
+  if not res:
+    flash('Failed to create your account')
+    return render_template('new_account.html')
+
+  session['account_id'] = res['id']
+  return redirect(url_for('setup_google'))
 
 
 # lookup a specific object e.g. voice menu, call queue, receiving number, etc...

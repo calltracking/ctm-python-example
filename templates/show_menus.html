@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>Menus <small><a href="/menus/new">Add Menu</a> | {{pager.total_entries}} menus</small></h1>
+  <table class="entries">
+    <thead>
+      <tr>
+        <th>Menu</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for menu in pager.menus %}
+        <tr>
+          <td>
+            <a href="/menus/{{menu.id}}/edit"><label>{% if menu.name %} {{menu.name}} {% endif %}</label><br/>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="10"><em>No menus to show</em></td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+    </tfoot>
+  </table>
+  {% if pager.previous_page %}
+    <a href="?page={{pager.page-1}}">Previous page</a>
+  {% endif %}
+  {% if pager.next_page %}
+    <a href="?page={{pager.page+1}}">Next page</a>
+  {% endif %}
+{% endblock %}
