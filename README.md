@@ -67,7 +67,7 @@ The format of a `say` message is as follows:
 <tbody>
 <tr>
     <td>{{voice}}</td>
-    <td>`man` or `woman`</td/>
+    <td>`man` or `woman` or `alice`</td/>
     </tr>
     <tr>
     <td>{{language}} if `{{voice}}` is `man` or `woman`</td>
@@ -150,4 +150,4 @@ The format of a play message is as follows:
 
 where `{{url}}` is the URL of an audio file in one of the following formats MP3, WAV, AIFF, GSM, μ-law and is smaller than 7MB, i.e.
 
-    `play:http://www.springfieldfiles.com/sounds/homer/hacker.mp3`
+    play:http://www.springfieldfiles.com/sounds/homer/hacker.mp3
