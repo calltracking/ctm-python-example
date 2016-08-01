@@ -261,10 +261,10 @@ def edit_menu(menu_id):
   menu = ctm_get('/accounts/%d/voice_menus/%s' % (g.account_id, menu_id)) 
   return render_template('edit_menu.html', menu=menu)
 
-@app.route('/menus/<menu_id>/items/<item_id>', methods=['GET'])
-def show_menu_item(menu_id, item_id):
-  menu = ctm_get('/accounts/%d/voice_menus/%s' % (g.account_id, menu_id)) 
-  return render_template('edit_menu.html', menu=menu)
+@app.route('/menus/<menu_id>/items', methods=['GET'])
+def show_menu_items(menu_id):
+  data = ctm_get('/accounts/%d/voice_menus/%s/voice_menu_items' % (g.account_id, menu_id)) 
+  return jsonify(data)
 
 @app.route('/menus/<menu_id>', methods=['POST'])
 def update_menu(menu_id):
@@ -291,6 +291,12 @@ def lookup_object(object_type):
     search = ''
 
   objects = ctm_get('/accounts/%d/lookup' % g.account_id, {'object_type': object_type, 'search': search, 'idstr': '1'})
+  return json.dumps(objects)
+
+# lookup by id
+@app.route('/lookup/<object_type>/<object_id>', methods=['GET'])
+def lookup_object_ids(object_type, object_id):
+  objects = ctm_get('/accounts/%d/lookupid' % g.account_id, {'object_type': object_type, 'object_id': object_id})
   return json.dumps(objects)
 
 if __name__ == '__main__':
