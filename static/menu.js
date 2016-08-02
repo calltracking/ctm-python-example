@@ -1,4 +1,4 @@
-function routePicker(selector, objectType) {
+function objectPicker(selector, objectType, tagPicker) {
   $(selector).select2({
     ajax: {
       url: "/lookup/" + objectType,
@@ -15,6 +15,7 @@ function routePicker(selector, objectType) {
       },
       cache: true
     },
+    tags: tagPicker,
     minimumInputLength: 0
   });
 }
@@ -52,25 +53,33 @@ function setupSchedulePicker(defaultOptions) {
   });
 }
 
+function addItem(item) {
+  var markup = Mustache.to_html(Templates.menu_items[item.voice_action_type],item);
+  $("#items").append(markup);
+  var element = $("#items .item:last");
+  element.find(".check-value").each(function() {
+    var itemElement = $(this);
+    var type        = itemElement.attr("data-type");
+    var value       = itemElement.val();
+    if (!value) { objectPicker(itemElement, type); return; }
+    var activeItem  = itemElement.find("option[value=" + value + "]");
+
+    $.get("/lookup/" + type + "/" + value, function(res) {
+      var opt = $("#items option[value=" + value + "]").get(0);
+      opt.text = res.text;
+      objectPicker(itemElement, type);
+    },'json');
+  });
+  objectPicker(element.find(".tagpicker"), "tag", true);
+  objectPicker(element.find(".agentpicker"), "agent");
+}
+
 function loadItems() {
   var menu_id = $("#items").attr("data-id");
   $.get("/menus/" + menu_id + "/items", function(res) {
     console.log(res);
-    $("#items").html(res.items.map(function(item) {
-      return Mustache.to_html(Templates.menu_items[item.voice_action_type],item);
-    }).join(""));
-    $("#items .check-value").each(function() {
-      var itemElement = $(this);
-      var type        = itemElement.attr("data-type");
-      var value       = itemElement.val();
-      if (!value) { routePicker(itemElement, type); return; }
-      var activeItem  = itemElement.find("option[value=" + value + "]");
-
-      $.get("/lookup/" + type + "/" + value, function(res) {
-        var opt = $("#items option[value=" + value + "]").get(0);
-        opt.text = res.text;
-        routePicker(itemElement, type);
-      },'json');
+    res.items.forEach(function(item) {
+      addItem(item);
     });
   });
 }
