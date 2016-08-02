@@ -9,7 +9,7 @@ pip install flask
 pip install flask-socketio
 ```
 
-A CallTrackingMetrics agency account - signup here: https://www.calltrackingmetrics.com/plans
+A CallTrackingMetrics advanced account - signup here: https://www.calltrackingmetrics.com/plans
 
 ## Running the example application
 
