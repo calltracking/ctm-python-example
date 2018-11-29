@@ -9,7 +9,7 @@ import json
 import urllib
 import uuid
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
-from flask.ext.socketio import SocketIO, emit, disconnect
+from flask_socketio import SocketIO, emit, disconnect
 
 app = Flask(__name__)
 app.config.update(dict(
