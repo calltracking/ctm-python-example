@@ -2,7 +2,7 @@ CTM Python
 ----------
 
 ## Installation
-```json
+```bash
 git clone https://github.com/calltracking/ctm-python-example.git
 cd ctm-python-example
 pip install flask
